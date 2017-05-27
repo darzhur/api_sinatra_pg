@@ -8,9 +8,6 @@ require 'sequel/extensions/seed'
 # require 'json'
 # require 'multi_json'
 
-
-%w{controllers models routes}.each {|dir| Dir.glob("./#{dir}/*.rb", &method(:require))}
-
 DB = Sequel.connect(
     adapter: :postgres,
     database: 'api_sinatra_development',
@@ -18,9 +15,19 @@ DB = Sequel.connect(
     password: 'password',
     user: 'admind',
     max_connections: 10,
-    logger: Logger.new('log/db.log')
+    # logger: Logger.new('log/db.log')
 )
 
+%w{controllers models routes}.each {|dir| Dir.glob("./#{dir}/*.rb", &method(:require))}
+
+before do
+  content_type 'application/json' # Uncomment - To see perfectly in POSTMAN - in tab Pretty
+end
+
+#сериализируем - приводим в удобо
+def collection_to_api(collection)
+  MultiJson.dump(collection.map { |s| s.to_api })
+end
 # module MyAppModule
 #   class App < Sinatra::Base
 #     register Sinatra::Namespace
